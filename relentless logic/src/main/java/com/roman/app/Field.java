@@ -10,6 +10,7 @@ public class Field {
     private int rows;
     private int bombs;
     private List<Cell> badBombList;
+    private List<Cell> baseBlockBombList;
 
     public Field(int rows, int bombs){
         this.rows = rows;
@@ -21,6 +22,10 @@ public class Field {
                 new Cell(CellType.BOMB, 1, 0),
                 new Cell(CellType.BOMB, 1, 1),
                 new Cell(CellType.BOMB, rows - 1, rows - 1));
+
+        this.baseBlockBombList = List.of(new Cell(CellType.BOMB, rows - 2, rows - 2),
+                new Cell(CellType.BOMB, rows - 2, rows - 1),
+                new Cell(CellType.BOMB, rows - 1, rows - 2));
 
         List<Cell> bombList = createBombList();
 
@@ -51,9 +56,14 @@ public class Field {
                 int y = new Random().nextInt(rows);
                 bombList.add(new Cell(CellType.BOMB, x, y));
             }
-            //цикл крутиться поки є дублікати або погані бомби
-        }while(bombList.stream().distinct().count() != bombList.size() && !isNotHasBadBombs(bombList));
+            //цикл крутиться поки є дублікати або погані бомби або база заблокована
+        }while(!isFieldBombsCorrect(bombList));
         return bombList;
+    }
+    private boolean isFieldBombsCorrect(List<Cell> bombList){
+        return bombList.stream().distinct().count() == bombList.size()
+                && isNotHasBadBombs(bombList)
+                && isBaseOpen(bombList);
     }
     private boolean isNotHasBadBombs(List<Cell> bombList){
         for(Cell badBomb : badBombList){
@@ -62,9 +72,11 @@ public class Field {
         }
         return true;
     }
+    private boolean isBaseOpen(List<Cell> bombList){
+        return !bombList.containsAll(baseBlockBombList);
+    }
     public void printField(){
         char verBorder = '|';
-        char horBorder = '-';
         String header = "-".repeat(rows * 2 + 2);
 
         System.out.println(header);
