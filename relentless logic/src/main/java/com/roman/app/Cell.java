@@ -1,28 +1,28 @@
 package com.roman.app;
 
+import com.roman.app.cells.*;
+import com.roman.app.cells.Player;
 import lombok.Data;
 
 import java.util.Objects;
 
 @Data
 public class Cell {
-    private CellType cellType;
+    private Entity entity;
     private int x;
     private int y;
 
-    public Cell(CellType cellType, int x, int y){
-        this.cellType = cellType;
+    public Cell(Entity entity, int x, int y){
+        this.entity = entity;
         this.x = x;
         this.y = y;
     }
     public void printCellType(){
-        switch (cellType) {
-            case BOMB -> System.out.print("o");
-            case CLEAR -> System.out.print("/");
-            case PLAYER -> System.out.print("*");
-            case UNKNOWN -> System.out.print(" ");
-            case BASE -> System.out.print("B");
-        }
+        if(entity instanceof Bomb) System.out.print("0");
+        if(entity instanceof Clear) System.out.print("/");
+        if(entity instanceof Start) System.out.print("*");
+        if(entity instanceof Unknown) System.out.print(" ");
+        if(entity instanceof Base) System.out.print("B");
     }
 
     @Override

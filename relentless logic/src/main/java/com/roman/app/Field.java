@@ -1,12 +1,16 @@
 package com.roman.app;
 
+import com.roman.app.cells.Base;
+import com.roman.app.cells.Bomb;
+import com.roman.app.cells.Player;
+import com.roman.app.cells.Unknown;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class Field {
-    private List<List<Cell>> field;
+    private List<List<Cell>> matrix;
     private int rows;
     private int bombs;
     private List<Cell> badBombList;
@@ -15,35 +19,35 @@ public class Field {
     public Field(int rows, int bombs){
         this.rows = rows;
         this.bombs = bombs;
-        this.field = new ArrayList<>();
+        this.matrix = new ArrayList<>();
 
-        this.badBombList = List.of(new Cell(CellType.BOMB, 0, 0),
-                new Cell(CellType.BOMB, 0, 1),
-                new Cell(CellType.BOMB, 1, 0),
-                new Cell(CellType.BOMB, 1, 1),
-                new Cell(CellType.BOMB, rows - 1, rows - 1));
+        this.badBombList = List.of(new Cell(new Bomb(), 0, 0),
+                new Cell(new Bomb(), 0, 1),
+                new Cell(new Bomb(), 1, 0),
+                new Cell(new Bomb(), 1, 1),
+                new Cell(new Bomb(), rows - 1, rows - 1));
 
-        this.baseBlockBombList = List.of(new Cell(CellType.BOMB, rows - 2, rows - 2),
-                new Cell(CellType.BOMB, rows - 2, rows - 1),
-                new Cell(CellType.BOMB, rows - 1, rows - 2));
+        this.baseBlockBombList = List.of(new Cell(new Bomb(), rows - 2, rows - 2),
+                new Cell(new Bomb(), rows - 2, rows - 1),
+                new Cell(new Bomb(), rows - 1, rows - 2));
 
         List<Cell> bombList = createBombList();
 
         for(int i = 0; i < rows; i ++){
-            field.add(new ArrayList<>());
+            matrix.add(new ArrayList<>());
 
             for(int j = 0; j < rows; j++){
                 if(i == 0 && j == 0)
-                    field.get(i).add(new Cell(CellType.PLAYER, i, j));
+                    matrix.get(i).add(new Cell(new Player(), i, j));
                 else if( i == rows-1 && j == rows-1)
-                    field.get(i).add(new Cell(CellType.BASE, i, j));
+                    matrix.get(i).add(new Cell(new Base(), i, j));
                 else
-                    field.get(i).add(new Cell(CellType.UNKNOWN, i, j));
+                    matrix.get(i).add(new Cell(new Unknown(), i, j));
             }
         }
 
         for(Cell bomb : bombList){
-            field.get(bomb.getX()).set(bomb.getY(), bomb);
+            matrix.get(bomb.getX()).set(bomb.getY(), bomb);
         }
     }
 
@@ -54,7 +58,7 @@ public class Field {
             for(int i = 0; i < bombs; i++){
                 int x = new Random().nextInt(rows);
                 int y = new Random().nextInt(rows);
-                bombList.add(new Cell(CellType.BOMB, x, y));
+                bombList.add(new Cell(new Bomb(), x, y));
             }
             //цикл крутиться поки є дублікати або погані бомби або база заблокована
         }while(!isFieldBombsCorrect(bombList));
@@ -80,7 +84,7 @@ public class Field {
         String header = "-".repeat(rows * 2 + 2);
 
         System.out.println(header);
-        field.forEach(cellRow -> {
+        matrix.forEach(cellRow -> {
                     cellRow.forEach(cell -> {
                         System.out.print(verBorder);
                         cell.printCellType();
